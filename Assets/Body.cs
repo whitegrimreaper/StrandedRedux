@@ -49,7 +49,7 @@ public class Body {
 
     public class Organ
     {
-        //gonna flesh out later probably
+        //gonna flesh out later maybe
     }
 
     public Limb[] limbs;
@@ -59,13 +59,33 @@ public class Body {
     {
         //Limbs will be in order:
         //Head
+        //torso
         //Left Arm
-        //Right Arm (+addl arms here)
+        //Right Arm
         //Left Leg
-        //Right Leg (+addl arms here)
-        //3rd leg (+tails and other special shit here)
-        limbs = new Limb[1];
-        limbs[0] = new Limb();
+        //Right Leg
+        //extra
+        limbs = new Limb[6];
+        limbs[0] = new Limb(); //head
+        limbs[0].affectCognit = true;
+        limbs[0].affectConcious = true;
+
+        limbs[1] = new Limb(); //torso
+        limbs[1].affectConcious = true;
+        limbs[1].affectWalk = true;
+        limbs[1].affectManip = true;
+
+        limbs[2] = new Limb(); //l arm
+        limbs[2].affectManip = true;
+
+        limbs[3] = new Limb(); //r arm
+        limbs[3].affectManip = true;
+
+        limbs[4] = new Limb(); //l leg
+        limbs[4].affectWalk = true;
+
+        limbs[5] = new Limb();//r leg
+        limbs[5].affectWalk = true;
     }
 
     public Body(string race)
