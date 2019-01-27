@@ -5,6 +5,8 @@ using UnityEngine;
 public class PlayerVars : MonoBehaviour {
 
     public Body body;
+    public Item[] items;
+    //public Equipment[] equips;
 
 	// Use this for initialization
 	void Start () {

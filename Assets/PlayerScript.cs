@@ -47,6 +47,7 @@ public class PlayerScript : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
         playerMovementInput();
+        playerWorldInteraction();
 		
     }
 
@@ -207,6 +208,20 @@ public class PlayerScript : MonoBehaviour {
                 //log items
             }
             
+        }
+    }
+
+    void playerWorldInteraction()
+    {
+        Vector2 pos = new Vector2(this.transform.position.x, this.transform.position.y);
+        if (Input.GetKeyDown(KeyCode.G))
+        {
+
+            if(checkForItems(pos))
+            {
+                //if inv has space
+                //addToInventory()
+            }
         }
     }
 }
