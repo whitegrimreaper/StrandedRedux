@@ -38,25 +38,32 @@ public class PlayerScript : MonoBehaviour {
     }
 
     Dir dirs;
+    bool waitingOnInput;
 
     // Use this for initialization
     void Start () {
+        waitingOnInput = false;
 		
 	}
 	
 	// Update is called once per frame
 	void Update () {
-        playerMovementInput();
+        if(waitingOnInput)
+        {
+            playerDirectionInput();
+        }
+        else
+        {
+            playerMovementInput();
+        }
         playerWorldInteraction();
 		
     }
 
     bool checkMove(Dir dir)
     {
-        //checkFurniture();
         //checkItems();
-        //checkTile(dir);
-        return checkTile(dir);
+        return (checkTile(dir) && checkFurniture(dir));
     }
 
     bool checkDoor(GameObject tile)
@@ -79,9 +86,37 @@ public class PlayerScript : MonoBehaviour {
         return false;
     }
 
+    //empty
     bool checkForItems(Vector2 loc)
     {
         return false;
+    }
+
+    bool checkFurniture(Dir dir)
+    {
+        Vector2 loc = new Vector2(this.transform.position.x + dir.horz, this.transform.position.y + dir.vert);
+
+        GameObject[] objs;
+        objs = GameObject.FindGameObjectsWithTag("Furn");
+        GameObject furn = findInScene(objs, loc);
+
+        //Debug.Log("Tile at loc: " + loc.x + ", " + loc.y);
+
+        if (furn == null)
+        {
+            Debug.Log("CheckFurn Returned null");
+            return true;
+        }
+        else if (checkPassable(furn, "furn"))
+        {
+            Debug.Log("Furniture found at loc: " + loc.x + ", " + loc.y + ", is passable");
+            return true;
+        }
+        else
+        {
+            Debug.Log("Furniture found at loc: " + loc.x + ", " + loc.y + ", is NOT passable");
+            return false;
+        }
     }
 
     bool checkTile(Dir dir)
@@ -90,7 +125,7 @@ public class PlayerScript : MonoBehaviour {
 
         GameObject[] objs;
         objs = GameObject.FindGameObjectsWithTag("Tile");
-        GameObject tile = findTile(objs, loc);
+        GameObject tile = findInScene(objs, loc);
 
         //Debug.Log("Tile at loc: " + loc.x + ", " + loc.y);
 
@@ -99,7 +134,7 @@ public class PlayerScript : MonoBehaviour {
             Debug.Log("CheckTile Returned null");
             return true;
         }
-        else if (checkPassable(tile))
+        else if (checkPassable(tile, "tile"))
         {
             Debug.Log("Tile found at loc: " + loc.x + ", " + loc.y + ", is passable");
             return true;
@@ -112,19 +147,35 @@ public class PlayerScript : MonoBehaviour {
         }
         return false;
     }
-    
 
-    bool checkPassable(GameObject obj)
+
+    bool checkPassable(GameObject obj, string tag)
     {
-        TileScript scr = obj.GetComponent<TileScript>();
-        if(scr == null)
-        {
-            Debug.Log("lol");
-            return false;
-        }
-        else
-        {
-            return scr.isPassable();
+        switch (tag) {
+            case "tile":
+                TileScript tile = obj.GetComponent<TileScript>();
+                if (tile == null)
+                {
+                    Debug.Log("lol");
+                    return false;
+                }
+                else
+                {
+                    return tile.isPassable();
+                }
+            case "furn":
+                FurnitureScript furn = obj.GetComponent<FurnitureScript>();
+                if (furn == null)
+                {
+                    Debug.Log("lol");
+                    return false;
+                }
+                else
+                {
+                    return furn.isPassable();
+                }
+            default:
+                return true;
         }
     }
 
@@ -142,13 +193,13 @@ public class PlayerScript : MonoBehaviour {
         }
     }
 
-    GameObject findTile(GameObject[] objs, Vector2 loc)
+    GameObject findInScene(GameObject[] objs, Vector2 loc)
     {
         for(int i = 0; i < objs.Length; i++)
         {
             if(objs[i].transform.position.x == loc.x && objs[i].transform.position.y == loc.y)
             {
-                Debug.Log("Tile found at location: " + loc.x + ", " + loc.y);
+                Debug.Log("Object found at location: " + loc.x + ", " + loc.y);
                 return objs[i];
             }
         }
@@ -209,6 +260,18 @@ public class PlayerScript : MonoBehaviour {
             }
             
         }
+    }
+
+    //empty
+    void playerCommandInput()
+    {
+
+    }
+
+    //empty
+    void playerDirectionInput()
+    {
+
     }
 
     void playerWorldInteraction()

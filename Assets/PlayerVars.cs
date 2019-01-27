@@ -10,11 +10,21 @@ public class PlayerVars : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-        body = new Body("Human");
+        body = new Body();
 	}
 	
 	// Update is called once per frame
 	void Update () {
 		
 	}
+
+    void takeDamage(int part, double damage, int type)
+    {
+        body.damagePart(part, damage, type);
+        //update UI to reflect
+        if(body.checkDead())
+        {
+            //geemu ova
+        }
+    }
 }
