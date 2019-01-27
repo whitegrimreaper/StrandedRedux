@@ -54,7 +54,33 @@ public class PlayerScript : MonoBehaviour {
     {
         //checkFurniture();
         //checkItems();
+        //checkTile(dir);
         return checkTile(dir);
+    }
+
+    bool checkDoor(GameObject tile)
+    {
+        //Vector2 loc = new Vector2(this.transform.position.x + dir.horz, this.transform.position.y + dir.vert);
+
+        //GameObject[] objs;
+        //objs = GameObject.FindGameObjectsWithTag("Tile");
+        //GameObject tile = findTile(objs, loc);
+
+        if (tile == null)
+        {
+            //Debug.Log("cri cD");
+            return true;
+        }
+        else if (checkOpenable(tile))
+        {
+            return true;
+        }
+        return false;
+    }
+
+    bool checkForItems(Vector2 loc)
+    {
+        return false;
     }
 
     bool checkTile(Dir dir)
@@ -65,20 +91,25 @@ public class PlayerScript : MonoBehaviour {
         objs = GameObject.FindGameObjectsWithTag("Tile");
         GameObject tile = findTile(objs, loc);
 
-        Debug.Log("Tile at loc: " + loc.x + ", " + loc.y);
+        //Debug.Log("Tile at loc: " + loc.x + ", " + loc.y);
 
-        if(tile == null || checkPassable(tile))
+        if(tile == null)
         {
-            if (tile == null)
-            {
-                Debug.Log("cri");
-            }
+            Debug.Log("CheckTile Returned null");
             return true;
         }
-        else
+        else if (checkPassable(tile))
         {
+            Debug.Log("Tile found at loc: " + loc.x + ", " + loc.y + ", is passable");
+            return true;
+        }
+        else if(checkDoor(tile))
+        {
+            Debug.Log("Door found at loc: " + loc.x + ", " + loc.y + ", opening");
+            tile.GetComponent<TileScript>().open();
             return false;
         }
+        return false;
     }
     
 
@@ -92,7 +123,21 @@ public class PlayerScript : MonoBehaviour {
         }
         else
         {
-            return scr.passability;
+            return scr.isPassable();
+        }
+    }
+
+    bool checkOpenable(GameObject obj)
+    {
+        TileScript scr = obj.GetComponent<TileScript>();
+        if (scr == null)
+        {
+            Debug.Log("checkOpenable run with null script on tile");
+            return false;
+        }
+        else
+        {
+            return scr.isOpenable;
         }
     }
 
@@ -102,7 +147,7 @@ public class PlayerScript : MonoBehaviour {
         {
             if(objs[i].transform.position.x == loc.x && objs[i].transform.position.y == loc.y)
             {
-                Debug.Log("Ladies and gentlemen,  we gotteeem");
+                Debug.Log("Tile found at location: " + loc.x + ", " + loc.y);
                 return objs[i];
             }
         }
@@ -116,12 +161,14 @@ public class PlayerScript : MonoBehaviour {
 
     void playerMovementInput()
     {
+        bool moved = false;
         if (Input.GetKeyDown(KeyCode.W))
         {
             Dir dir = new Dir("up");
             if (checkMove(dir))
             {
                 move(dir);
+                moved = true;
             }
         }
         if (Input.GetKeyDown(KeyCode.A))
@@ -130,6 +177,7 @@ public class PlayerScript : MonoBehaviour {
             if (checkMove(dir))
             {
                 move(dir);
+                moved = true;
             }
         }
         if (Input.GetKeyDown(KeyCode.S))
@@ -138,6 +186,7 @@ public class PlayerScript : MonoBehaviour {
             if (checkMove(dir))
             {
                 move(dir);
+                moved = true;
             }
         }
         if (Input.GetKeyDown(KeyCode.D))
@@ -146,7 +195,18 @@ public class PlayerScript : MonoBehaviour {
             if (checkMove(dir))
             {
                 move(dir);
+                moved = true;
             }
+        }
+
+        if (moved)
+        {
+            Vector2 loc = new Vector2(this.transform.position.x, this.transform.position.y);
+            if (checkForItems(loc))
+            {
+                //log items
+            }
+            
         }
     }
 }
