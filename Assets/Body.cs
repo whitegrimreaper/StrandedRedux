@@ -57,7 +57,7 @@ public class Body {
     //    //gonna flesh out later maybe
     //}
 
-    public double totalBlood = 1000f;
+    public double totalBlood = 100f;
     private double currBlood;
 
     public Limb[] limbs;
@@ -113,6 +113,16 @@ public class Body {
         limbs[part].bleedingAmt += damage; // will depend on type
 
         limbs[part].damage = +damage; //will need to factor in armor and shit later
+    }
+
+    public void loseBlood(double damage)
+    {
+        this.currBlood -= damage;
+    }
+
+    public double getBlood()
+    {
+        return currBlood;
     }
 
     public bool checkDead()

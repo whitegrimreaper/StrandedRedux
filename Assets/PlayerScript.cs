@@ -40,10 +40,15 @@ public class PlayerScript : MonoBehaviour {
     Dir dirs;
     bool waitingOnInput;
 
+    Inventory inventory;
+    PlayerVars vars;
+
     // Use this for initialization
     void Start () {
         waitingOnInput = false;
-		
+
+        inventory = this.gameObject.GetComponentInChildren<Inventory>();
+        vars = this.GetComponent<PlayerVars>();
 	}
 	
 	// Update is called once per frame
@@ -60,10 +65,30 @@ public class PlayerScript : MonoBehaviour {
 		
     }
 
-    bool checkMove(Dir dir)
+    int checkMove(Dir dir)
     {
         //checkItems();
-        return (checkTile(dir) && checkFurniture(dir));
+        //0 == good
+        //1 == tile bad
+        //2 == furniture bad
+        //3 == NPC bad
+        bool tile = checkTile(dir);
+        bool furn = checkFurniture(dir);
+        bool npc = checkNPC(dir);
+        if(tile)
+        {
+            if(furn)
+            {
+                if(!npc)
+                {
+                    return 0;
+                }
+                return 3;
+            }
+            return 2;
+        }
+        return 1;
+        //return (checkTile(dir) && checkFurniture(dir) && (!checkNPC(dir)));
     }
 
     bool checkDoor(GameObject tile)
@@ -86,10 +111,20 @@ public class PlayerScript : MonoBehaviour {
         return false;
     }
 
-    //empty
+    //uses loc because it checks the player's location, could probably change
     bool checkForItems(Vector2 loc)
     {
-        return false;
+        GameObject found = findInScene(GameObject.FindGameObjectsWithTag("Item"), loc);
+        if (found == null)
+        {
+            Debug.Log("CheckForItems Returned null");
+            return false;
+        }
+        else 
+        {
+            Debug.Log("Item found!");
+            return true;
+        }
     }
 
     bool checkFurniture(Dir dir)
@@ -148,6 +183,33 @@ public class PlayerScript : MonoBehaviour {
         return false;
     }
 
+    //returns true if there is an NPC in Dir from the player
+    bool checkNPC(Dir dir)
+    {
+        Vector2 loc = new Vector2(this.transform.position.x + dir.horz, this.transform.position.y + dir.vert);
+
+        GameObject[] objs;
+        objs = GameObject.FindGameObjectsWithTag("NPC");
+        GameObject npc = findInScene(objs, loc);
+
+        //Debug.Log("NPC at loc: " + loc.x + ", " + loc.y);
+
+        if (npc == null)
+        {
+            Debug.Log("CheckNPC Returned null");
+            return false;
+        }
+        else if (false /* gonna want to check and see if the NPC is hostile eventually*/)
+        {
+            Debug.Log("NPC at loc: " + loc.x + ", " + loc.y);
+            //return true;
+        }
+        else
+        {
+            Debug.Log("NPC at loc: " + loc.x + ", " + loc.y);
+            return true; ;
+        }
+    }
 
     bool checkPassable(GameObject obj, string tag)
     {
@@ -193,13 +255,14 @@ public class PlayerScript : MonoBehaviour {
         }
     }
 
+    //checks for an object at location loc in the given list objs
     GameObject findInScene(GameObject[] objs, Vector2 loc)
     {
         for(int i = 0; i < objs.Length; i++)
         {
             if(objs[i].transform.position.x == loc.x && objs[i].transform.position.y == loc.y)
             {
-                Debug.Log("Object found at location: " + loc.x + ", " + loc.y);
+                //Debug.Log("Object found at location: " + loc.x + ", " + loc.y);
                 return objs[i];
             }
         }
@@ -214,40 +277,58 @@ public class PlayerScript : MonoBehaviour {
     void playerMovementInput()
     {
         bool moved = false;
+        Dir dir = null;
         if (Input.GetKeyDown(KeyCode.W))
         {
-            Dir dir = new Dir("up");
-            if (checkMove(dir))
-            {
-                move(dir);
-                moved = true;
-            }
+            dir = new Dir("up");
         }
         if (Input.GetKeyDown(KeyCode.A))
         {
-            Dir dir = new Dir("left");
-            if (checkMove(dir))
-            {
-                move(dir);
-                moved = true;
-            }
+            dir = new Dir("left");
         }
         if (Input.GetKeyDown(KeyCode.S))
         {
-            Dir dir = new Dir("down");
-            if (checkMove(dir))
+            dir = new Dir("down");
+        }
+        if (Input.GetKeyDown(KeyCode.D))
+        {
+            dir = new Dir("right");
+        }
+        if (dir != null)
+        {
+            int moveResult = checkMove(dir);
+            //0 means we can move
+            if(moveResult == 0)
             {
                 move(dir);
                 moved = true;
             }
-        }
-        if (Input.GetKeyDown(KeyCode.D))
-        {
-            Dir dir = new Dir("right");
-            if (checkMove(dir))
+            //1 means bad tile
+            else if (moveResult == 1)
             {
-                move(dir);
-                moved = true;
+                //do nothing now, might log later
+            }
+            //2 means furniture in way
+            else if (moveResult == 2)
+            {
+                //should either log or maybe prompt for open
+            }
+            else if (moveResult == 3)
+            {
+                Vector2 loc = new Vector2(this.transform.position.x + dir.horz, this.transform.position.y + dir.vert);
+
+                GameObject[] objs;
+                objs = GameObject.FindGameObjectsWithTag("NPC");
+                GameObject npc = findInScene(objs, loc);
+                NPCScript npcScript = npc.GetComponent<NPCScript>();
+                PlayerVars npcVars = npc.GetComponent<PlayerVars>();
+
+                if(npcScript.hostile)
+                {
+                    Debug.Log("REEEEEEEEEEE");
+                    vars.attack(npcVars);
+                }
+                
             }
         }
 
@@ -282,9 +363,20 @@ public class PlayerScript : MonoBehaviour {
 
             if(checkForItems(pos))
             {
-                //if inv has space
-                //addToInventory()
+                GameObject found = findInScene(GameObject.FindGameObjectsWithTag("Item"), pos);
+                //GameObject copy = GameObject.Instantiate(found);
+                bool destroy = inventory.addToInventory(found);
+                if(destroy)
+                {
+                    // not currently destroying the object because unity
+                    //GameObject.Destroy(found);
+                }
+                //GameObject.Destroy(copy);
             }
+        }
+        if (Input.GetKeyDown(KeyCode.L))
+        {
+            //drop item
         }
     }
 }
