@@ -8,6 +8,7 @@ TagManager:
   - Furn
   - Item
   - NPC
+  - Transporter
   layers:
   - Default
   - TransparentFX

@@ -2,49 +2,48 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SceneManager : MonoBehaviour {
-
+public class BoardManager : MonoBehaviour
+{
     public int boardRows, boardColumns;
     public int minRoomSize, maxRoomSize;
+    public GameObject floorTile;
+    public GameObject corridorTile;
+    public GameObject wallTile;
+    public GameObject player;
 
-    public GameObject floor;
-    public GameObject corridorT;
+    private GameObject[,] boardPositionsFloor;
 
-    private GameObject[,] floorPositions;
-
-    public class SubShip
+    public class SubDungeon
     {
-        public SubShip left, right;
+        public SubDungeon left, right;
         public Rect rect;
         public Rect room = new Rect(-1, -1, 0, 0); // i.e null
         public int debugId;
-
         public List<Rect> corridors = new List<Rect>();
-
 
         private static int debugCounter = 0;
 
-        public SubShip(Rect mrect)
+        public SubDungeon(Rect mrect)
         {
             rect = mrect;
             debugId = debugCounter;
             debugCounter++;
         }
 
-        public bool IsLeaf()
+        public bool IAmLeaf()
         {
             return left == null && right == null;
         }
 
         public bool Split(int minRoomSize, int maxRoomSize)
         {
-            if (!IsLeaf())
+            if (!IAmLeaf())
             {
                 return false;
             }
 
             // choose a vertical or horizontal split depending on the proportions
-            // i.e. if too wide split vertically, or too long horizontally,
+            // i.e. if too wide split vertically, or too long horizontally, 
             // or if nearly square choose vertical or horizontal at random
             bool splitH;
             if (rect.width / rect.height >= 1.25)
@@ -62,27 +61,27 @@ public class SceneManager : MonoBehaviour {
 
             if (Mathf.Min(rect.height, rect.width) / 2 < minRoomSize)
             {
-                Debug.Log("Sub-ship " + debugId + " will be a leaf");
+                Debug.Log("Sub-dungeon " + debugId + " will be a leaf");
                 return false;
             }
 
             if (splitH)
             {
-                // split so that the resulting sub-ships widths are not too small
-                // (since we are splitting horizontally)
+                // split so that the resulting sub-dungeons widths are not too small
+                // (since we are splitting horizontally) 
                 int split = Random.Range(minRoomSize, (int)(rect.width - minRoomSize));
 
-                left = new SubShip(new Rect(rect.x, rect.y, rect.width, split));
-                right = new SubShip(
-                  new Rect(rect.x, rect.y + split, rect.width, rect.height - split));
+                left = new SubDungeon(new Rect(rect.x, rect.y, rect.width, split));
+                right = new SubDungeon(
+                    new Rect(rect.x, rect.y + split, rect.width, rect.height - split));
             }
             else
             {
                 int split = Random.Range(minRoomSize, (int)(rect.height - minRoomSize));
 
-                left = new SubShip(new Rect(rect.x, rect.y, split, rect.height));
-                right = new SubShip(
-                  new Rect(rect.x + split, rect.y, rect.width - split, rect.height));
+                left = new SubDungeon(new Rect(rect.x, rect.y, split, rect.height));
+                right = new SubDungeon(
+                    new Rect(rect.x + split, rect.y, rect.width - split, rect.height));
             }
 
             return true;
@@ -98,47 +97,25 @@ public class SceneManager : MonoBehaviour {
             {
                 right.CreateRoom();
             }
-            if (IsLeaf())
+            if (left != null && right != null)
+            {
+                CreateCorridorBetween(left, right);
+            }
+            if (IAmLeaf())
             {
                 int roomWidth = (int)Random.Range(rect.width / 2, rect.width - 2);
                 int roomHeight = (int)Random.Range(rect.height / 2, rect.height - 2);
                 int roomX = (int)Random.Range(1, rect.width - roomWidth - 1);
                 int roomY = (int)Random.Range(1, rect.height - roomHeight - 1);
 
-                // room position will be absolute in the board, not relative to the sub-ship
+                // room position will be absolute in the board, not relative to the sub-dungeon
                 room = new Rect(rect.x + roomX, rect.y + roomY, roomWidth, roomHeight);
-                Debug.Log("Created room " + room + " in sub-ship " + debugId + " " + rect);
+                Debug.Log("Created room " + room + " in sub-dungeon " + debugId + " " + rect);
             }
         }
 
-        public Rect GetRoom()
-        {
-            if (IsLeaf())
-            {
-                return room;
-            }
-            if (left != null)
-            {
-                Rect lroom = left.GetRoom();
-                if (lroom.x != -1)
-                {
-                    return lroom;
-                }
-            }
-            if (right != null)
-            {
-                Rect rroom = right.GetRoom();
-                if (rroom.x != -1)
-                {
-                    return rroom;
-                }
-            }
 
-            // workaround non nullable structs
-            return new Rect(-1, -1, 0, 0);
-        }
-
-        public void CreateCorridorBetween(SubShip left, SubShip right)
+        public void CreateCorridorBetween(SubDungeon left, SubDungeon right)
         {
             Rect lroom = left.GetRoom();
             Rect rroom = right.GetRoom();
@@ -218,97 +195,154 @@ public class SceneManager : MonoBehaviour {
                 Debug.Log("corridor: " + corridor);
             }
         }
+
+        public Rect GetRoom()
+        {
+            if (IAmLeaf())
+            {
+                return room;
+            }
+            if (left != null)
+            {
+                Rect lroom = left.GetRoom();
+                if (lroom.x != -1)
+                {
+                    return lroom;
+                }
+            }
+            if (right != null)
+            {
+                Rect rroom = right.GetRoom();
+                if (rroom.x != -1)
+                {
+                    return rroom;
+                }
+            }
+
+            // workaround non nullable structs
+            return new Rect(-1, -1, 0, 0);
+        }
     }
 
-    public void CreateBSP(SubShip subShip)
+
+
+    public void CreateBSP(SubDungeon subDungeon)
     {
-        Debug.Log("Splitting sub-ship " + subShip.debugId + ": " + subShip.rect);
-        if (subShip.IsLeaf())
+        Debug.Log("Splitting sub-dungeon " + subDungeon.debugId + ": " + subDungeon.rect);
+        if (subDungeon.IAmLeaf())
         {
-            // if the sub-ship is too large
-            if (subShip.rect.width > maxRoomSize
-              || subShip.rect.height > maxRoomSize
-              || Random.Range(0.0f, 1.0f) > 0.25)
+            // if the sub-dungeon is too large split it
+            if (subDungeon.rect.width > maxRoomSize
+                || subDungeon.rect.height > maxRoomSize
+                || Random.Range(0.0f, 1.0f) > 0.25)
             {
 
-                if (subShip.Split(minRoomSize, maxRoomSize))
+                if (subDungeon.Split(minRoomSize, maxRoomSize))
                 {
-                    Debug.Log("Splitted sub-ship " + subShip.debugId + " in "
-                      + subShip.left.debugId + ": " + subShip.left.rect + ", "
-                      + subShip.right.debugId + ": " + subShip.right.rect);
+                    Debug.Log("Splitted sub-dungeon " + subDungeon.debugId + " in "
+                        + subDungeon.left.debugId + ": " + subDungeon.left.rect + ", "
+                        + subDungeon.right.debugId + ": " + subDungeon.right.rect);
 
-                    CreateBSP(subShip.left);
-                    CreateBSP(subShip.right);
-                    subShip.CreateCorridorBetween(subShip.left, subShip.right); // maybe
+                    CreateBSP(subDungeon.left);
+                    CreateBSP(subDungeon.right);
                 }
             }
         }
     }
 
-    public void DrawRooms(SubShip subShip)
+    public void DrawRooms(SubDungeon subDungeon)
     {
-        if (subShip == null)
+        if (subDungeon == null)
         {
             return;
         }
-        if (subShip.IsLeaf())
+        if (subDungeon.IAmLeaf())
         {
-            for (int i = (int)subShip.room.x; i < subShip.room.xMax; i++)
+            for (int i = (int)subDungeon.room.x; i < subDungeon.room.xMax; i++)
             {
-                for (int j = (int)subShip.room.y; j < subShip.room.yMax; j++)
+                for (int j = (int)subDungeon.room.y; j < subDungeon.room.yMax; j++)
                 {
-                    GameObject instance = Instantiate(floor, new Vector3(i, j, 0f), Quaternion.identity) as GameObject;
+                    GameObject instance = Instantiate(floorTile, new Vector3(i, j, 0f), Quaternion.identity) as GameObject;
                     instance.transform.SetParent(transform);
-                    floorPositions[i, j] = instance;
+                    boardPositionsFloor[i, j] = instance;
                 }
             }
         }
         else
         {
-            DrawRooms(subShip.left);
-            DrawRooms(subShip.right);
+            DrawRooms(subDungeon.left);
+            DrawRooms(subDungeon.right);
         }
     }
 
-    void DrawCorridors(SubShip subShip)
+    void DrawCorridors(SubDungeon subDungeon)
     {
-        if (subShip == null)
+        if (subDungeon == null)
         {
             return;
         }
 
-        DrawCorridors(subShip.left);
-        DrawCorridors(subShip.right);
+        DrawCorridors(subDungeon.left);
+        DrawCorridors(subDungeon.right);
 
-        foreach (Rect corridor in subShip.corridors)
+        foreach (Rect corridor in subDungeon.corridors)
         {
             for (int i = (int)corridor.x; i < corridor.xMax; i++)
             {
                 for (int j = (int)corridor.y; j < corridor.yMax; j++)
                 {
-                    if (floorPositions[i, j] == null)
+                    if (boardPositionsFloor[i, j] == null)
                     {
-                        GameObject instance = Instantiate(corridorT, new Vector3(i, j, 0f), Quaternion.identity) as GameObject;
+                        GameObject instance = Instantiate(corridorTile, new Vector3(i, j, 0f), Quaternion.identity) as GameObject;
                         instance.transform.SetParent(transform);
-                        floorPositions[i, j] = instance;
+                        boardPositionsFloor[i, j] = instance;
                     }
                 }
             }
         }
     }
 
-    void Start()
+    void MakeWalls()
     {
-        SubShip rootsubShip = new SubShip(new Rect(0, 0, boardRows, boardColumns));
-        CreateBSP(rootsubShip);
-        rootsubShip.CreateRoom();
-
-        floorPositions = new GameObject[boardRows, boardColumns];
-        DrawRooms(rootsubShip);
+        for(int i = 0; i < boardRows; i++)
+        {
+            for(int j = 0; j < boardColumns; j++)
+            {
+                if (boardPositionsFloor[i, j] == null)
+                {
+                    GameObject instance = Instantiate(wallTile, new Vector3(i, j, 0f), Quaternion.identity) as GameObject;
+                    instance.transform.SetParent(transform);
+                    boardPositionsFloor[i, j] = instance;
+                }
+            }
+        }
     }
 
-    // Update is called once per frame
-    void Update () {
-		
-	}
+    void placePlayer()
+    {
+        for(int i = 0; i < Mathf.Min(boardColumns, boardRows); i++)
+        {
+            if(boardPositionsFloor[i,i] != null)
+            {
+                GameObject instance = Instantiate(player, new Vector3(i, i, 0f), Quaternion.identity) as GameObject;
+                instance.transform.SetParent(transform);
+                return;
+                //boardPositionsFloor[i, j] = instance;
+            }
+        }
+    }
+
+    void Start()
+    {
+        SubDungeon rootSubDungeon = new SubDungeon(new Rect(0, 0, boardRows, boardColumns));
+        CreateBSP(rootSubDungeon);
+        rootSubDungeon.CreateRoom();
+
+        boardPositionsFloor = new GameObject[boardRows, boardColumns];
+        DrawRooms(rootSubDungeon);
+        DrawCorridors(rootSubDungeon);
+
+        placePlayer();
+        MakeWalls();
+    }
 }

@@ -33,8 +33,10 @@ public class Inventory : MonoBehaviour {
             if (equips.equips[itemScript.equipLocation] == null)
             {
                 //put er in there
-                //equips.equips[itemScript.equipLocation] = item;
+                equips.equips[itemScript.equipLocation] = item;
+                equips.equipped[itemScript.equipLocation] = true;
                 //item.SetActive(false);
+                item.GetComponent<SpriteRenderer>().enabled = false;
             }
             
         }

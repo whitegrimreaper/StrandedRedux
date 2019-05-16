@@ -17,8 +17,8 @@ public class PlayerVars : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
         body = new Body();
-        equips = GetComponentInChildren<Equipment>();
-	}
+        equips = GameObject.FindGameObjectWithTag("Player").GetComponentInChildren<Equipment>();
+    }
 	
 	// Update is called once per frame
 	void Update () {
@@ -53,9 +53,10 @@ public class PlayerVars : MonoBehaviour {
     int doDamage()
     {
         float damage = 0.0f;
-        if(equips.equips[0] != null)
+        if(equips.equipped[0])
         {
-            damage = (strength + equips.equips[0].damage) * (Random.Range(.25f, 4));
+            Debug.Log("Attacking with weapon");
+            damage = (strength + equips.equips[0].GetComponent<Item>().damage) * (Random.Range(.25f, 4));
         }
         //if (has weapon) {do shit}
         //else

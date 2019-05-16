@@ -127,6 +127,21 @@ public class PlayerScript : MonoBehaviour {
         }
     }
 
+    bool checkForTransporter(Vector2 loc)
+    {
+        GameObject found = findInScene(GameObject.FindGameObjectsWithTag("Transporter"), loc);
+        if (found == null)
+        {
+            Debug.Log("CheckForTransporter Returned null");
+            return false;
+        }
+        else
+        {
+            Debug.Log("Transporter found!");
+            return true;
+        }
+    }
+
     bool checkFurniture(Dir dir)
     {
         Vector2 loc = new Vector2(this.transform.position.x + dir.horz, this.transform.position.y + dir.vert);
@@ -273,6 +288,10 @@ public class PlayerScript : MonoBehaviour {
     {
         this.transform.Translate(new Vector2(dir.horz, dir.vert));
     }
+    void teleport(Vector2 pos)
+    {
+        transform.position = pos;
+    }
 
     void playerMovementInput()
     {
@@ -297,6 +316,7 @@ public class PlayerScript : MonoBehaviour {
         if (dir != null)
         {
             int moveResult = checkMove(dir);
+            Debug.Log("checkMove returned " + moveResult);
             //0 means we can move
             if(moveResult == 0)
             {
@@ -377,6 +397,22 @@ public class PlayerScript : MonoBehaviour {
         if (Input.GetKeyDown(KeyCode.L))
         {
             //drop item
+        }
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            //teleport to location pointed to by whatever transporter the player is on
+            //used by stairs and teleporters
+            if(checkForTransporter(pos))
+            {
+                 GameObject[] objs;
+                 objs = GameObject.FindGameObjectsWithTag("Transporter");
+                 GameObject trans = findInScene(objs, pos);
+                 TransporterScript transporter = trans.GetComponent<TransporterScript>();
+                 if(transporter.accessible) {
+                    teleport(transporter.destination);
+                 }
+                 
+            }
         }
     }
 }

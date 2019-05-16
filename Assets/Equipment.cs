@@ -14,14 +14,17 @@ public class Equipment : MonoBehaviour {
     //1: helmet
     //2: chest
     //3: leg
-    public Item[] equips;
+    public GameObject[] equips;
+    public bool[] equipped;
 
 	// Use this for initialization
 	void Start () {
-        equips = new Item[4];
+        equips = new GameObject[4];
+        equipped = new bool[4];
         for(int i = 0; i < 4; i++)
         {
             equips[i] = null;
+            equipped[i] = false;
         }
 	}
 	
