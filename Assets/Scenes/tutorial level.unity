@@ -31612,6 +31612,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   destination: {x: 20, y: 0}
   accessible: 1
+  newScene: 0
 --- !u!212 &886067856
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -38247,6 +38248,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   destination: {x: 60, y: 0}
   accessible: 1
+  newScene: 0
 --- !u!212 &1109550794
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -45211,9 +45213,10 @@ GameObject:
   m_Component:
   - component: {fileID: 1295103917}
   - component: {fileID: 1295103916}
+  - component: {fileID: 1295103918}
   m_Layer: 0
   m_Name: tilemap_324
-  m_TagString: Untagged
+  m_TagString: Transporter
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -45280,6 +45283,21 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 33
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1295103918
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1295103915}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe13933a8d02f684f97bc03d94b76407, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  destination: {x: 0, y: 0}
+  accessible: 1
+  newScene: 1
 --- !u!1 &1297200941
 GameObject:
   m_ObjectHideFlags: 0
@@ -63862,12 +63880,12 @@ PrefabInstance:
     - target: {fileID: 8437888066749298346, guid: 4f05f52341b7de141a25e4c6e6044626,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 110
+      value: 109
       objectReference: {fileID: 0}
     - target: {fileID: 8437888066749298346, guid: 4f05f52341b7de141a25e4c6e6044626,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: -0.000016212
       objectReference: {fileID: 0}
     - target: {fileID: 8437888066749298346, guid: 4f05f52341b7de141a25e4c6e6044626,
         type: 3}

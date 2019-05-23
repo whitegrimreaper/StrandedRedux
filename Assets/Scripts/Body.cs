@@ -120,6 +120,11 @@ public class Body {
         this.currBlood -= damage;
     }
 
+    public void heal(double healing)
+    {
+        this.currBlood += healing;
+    }
+
     public double getBlood()
     {
         return currBlood;

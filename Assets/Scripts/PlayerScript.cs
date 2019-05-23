@@ -385,6 +385,12 @@ public class PlayerScript : MonoBehaviour {
             {
                 GameObject found = findInScene(GameObject.FindGameObjectsWithTag("Item"), pos);
                 //GameObject copy = GameObject.Instantiate(found);
+                if(found.name == "hpack")
+                {
+                    Body body = GetComponentInChildren<Body>();
+                    body.heal(50);
+                    Destroy(found);
+                }
                 bool destroy = inventory.addToInventory(found);
                 if(destroy)
                 {
@@ -408,7 +414,11 @@ public class PlayerScript : MonoBehaviour {
                  objs = GameObject.FindGameObjectsWithTag("Transporter");
                  GameObject trans = findInScene(objs, pos);
                  TransporterScript transporter = trans.GetComponent<TransporterScript>();
-                 if(transporter.accessible) {
+                if(transporter.newScene)
+                {
+                    transporter.loadNewScene();
+                }
+                 else if(transporter.accessible) {
                     teleport(transporter.destination);
                  }
                  

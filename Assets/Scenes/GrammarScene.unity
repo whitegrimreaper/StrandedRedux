@@ -112,7 +112,7 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1 &800834022
+--- !u!1 &891355906
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -120,8 +120,9 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 800834024}
-  - component: {fileID: 800834023}
+  - component: {fileID: 891355908}
+  - component: {fileID: 891355907}
+  - component: {fileID: 891355909}
   m_Layer: 0
   m_Name: Board
   m_TagString: Untagged
@@ -129,14 +130,14 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &800834023
+--- !u!114 &891355907
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 800834022}
-  m_Enabled: 1
+  m_GameObject: {fileID: 891355906}
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 29b2d5cdd16720247b13f0f1c1f0b0d4, type: 3}
   m_Name: 
@@ -150,18 +151,16 @@ MonoBehaviour:
     type: 3}
   wallTile: {fileID: 1859003680898274, guid: 67c6dee7e4852034092fc376a7504d49, type: 3}
   player: {fileID: 2010004977096270578, guid: bbb19c00e632888468314105425290e3, type: 3}
-  teleporter: {fileID: 8962793727986326130, guid: 3e68c991fbc69364dbb009c7e81bd2c0,
-    type: 3}
-  enemy: {fileID: 8437888066749298340, guid: 4f05f52341b7de141a25e4c6e6044626, type: 3}
+  teleporter: {fileID: 0}
+  enemy: {fileID: 0}
   key: {fileID: 0}
-  hpack: {fileID: 1653565577483561217, guid: 6227f54d39bee434da6ea7f4dd5d29e9, type: 3}
---- !u!4 &800834024
+--- !u!4 &891355908
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 800834022}
+  m_GameObject: {fileID: 891355906}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 86, y: -5, z: -0.265625}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -169,3 +168,27 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &891355909
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 891355906}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 43a8d30b490fa364c9fc0706be84e594, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  boardRows: 100
+  boardColumns: 100
+  minRoomSize: 10
+  maxRoomSize: 40
+  floorTile: {fileID: 1265293245711840, guid: 64f4fcb94e77fd64b96c18e609a7d633, type: 3}
+  corridorTile: {fileID: 1265293245711840, guid: 64f4fcb94e77fd64b96c18e609a7d633,
+    type: 3}
+  wallTile: {fileID: 1859003680898274, guid: 67c6dee7e4852034092fc376a7504d49, type: 3}
+  player: {fileID: 2010004977096270578, guid: bbb19c00e632888468314105425290e3, type: 3}
+  teleporter: {fileID: 0}
+  enemy: {fileID: 8437888066749298340, guid: 4f05f52341b7de141a25e4c6e6044626, type: 3}
+  key: {fileID: 0}

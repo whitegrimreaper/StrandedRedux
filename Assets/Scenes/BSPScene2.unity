@@ -154,7 +154,7 @@ MonoBehaviour:
     type: 3}
   enemy: {fileID: 8437888066749298340, guid: 4f05f52341b7de141a25e4c6e6044626, type: 3}
   key: {fileID: 0}
-  hpack: {fileID: 1653565577483561217, guid: 6227f54d39bee434da6ea7f4dd5d29e9, type: 3}
+  hpack: {fileID: 0}
 --- !u!4 &800834024
 Transform:
   m_ObjectHideFlags: 0

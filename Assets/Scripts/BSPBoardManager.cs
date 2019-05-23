@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BoardManager : MonoBehaviour
+public class BSPBoardManager : MonoBehaviour
 {
     public int boardRows, boardColumns;
     public int minRoomSize, maxRoomSize;
@@ -12,6 +12,13 @@ public class BoardManager : MonoBehaviour
     public GameObject player;
 
     private GameObject[,] boardPositionsFloor;
+    private SubDungeon root;
+    private List<SubDungeon> allRooms;
+
+    public GameObject teleporter;
+    public GameObject enemy;
+    public GameObject key;
+    public GameObject hpack;
 
     public class SubDungeon
     {
@@ -20,6 +27,9 @@ public class BoardManager : MonoBehaviour
         public Rect room = new Rect(-1, -1, 0, 0); // i.e null
         public int debugId;
         public List<Rect> corridors = new List<Rect>();
+
+        static System.Random rnd = new System.Random();
+        public bool roomChosen = false;
 
         private static int debugCounter = 0;
 
@@ -103,6 +113,7 @@ public class BoardManager : MonoBehaviour
             }
             if (IAmLeaf())
             {
+                
                 int roomWidth = (int)Random.Range(rect.width / 2, rect.width - 2);
                 int roomHeight = (int)Random.Range(rect.height / 2, rect.height - 2);
                 int roomX = (int)Random.Range(1, rect.width - roomWidth - 1);
@@ -114,6 +125,38 @@ public class BoardManager : MonoBehaviour
             }
         }
 
+        public void ListRooms(SubDungeon root, List<SubDungeon> allRooms)
+        {
+            if(root.IAmLeaf())
+            {
+                Debug.Log("Added Room");
+                allRooms.Add(root);
+            }
+            else
+            {
+                ListRooms(root.left, allRooms);
+                ListRooms(root.right, allRooms);
+            }
+        }
+
+        public SubDungeon chooseRoom(List<SubDungeon> rooms)
+        {
+            Debug.Log("Choosing from " + rooms.Count + " rooms");
+            int r = rnd.Next(rooms.Count);
+            Debug.Log("Chose room " + r);
+            rooms[r].roomChosen = true;
+            return rooms[r];
+        }
+
+        
+
+
+        public Vector2 randRoomPoint(SubDungeon room)
+        {
+            Rect rect = room.GetRoom();
+            Vector2 point = new Vector2((int)Random.Range(rect.x + 1, rect.xMax - 1), (int)Random.Range(rect.y + 1, rect.yMax - 1));
+            return point;
+        }
 
         public void CreateCorridorBetween(SubDungeon left, SubDungeon right)
         {
@@ -123,8 +166,8 @@ public class BoardManager : MonoBehaviour
             Debug.Log("Creating corridor(s) between " + left.debugId + "(" + lroom + ") and " + right.debugId + " (" + rroom + ")");
 
             // attach the corridor to a random point in each room
-            Vector2 lpoint = new Vector2((int)Random.Range(lroom.x + 1, lroom.xMax - 1), (int)Random.Range(lroom.y + 1, lroom.yMax - 1));
-            Vector2 rpoint = new Vector2((int)Random.Range(rroom.x + 1, rroom.xMax - 1), (int)Random.Range(rroom.y + 1, rroom.yMax - 1));
+            Vector2 lpoint = randRoomPoint(left);
+            Vector2 rpoint = randRoomPoint(right);
 
             // always be sure that left point is on the left to simplify the code
             if (lpoint.x > rpoint.x)
@@ -239,7 +282,7 @@ public class BoardManager : MonoBehaviour
 
                 if (subDungeon.Split(minRoomSize, maxRoomSize))
                 {
-                    Debug.Log("Splitted sub-dungeon " + subDungeon.debugId + " in "
+                    Debug.Log("Split sub-dungeon " + subDungeon.debugId + " in "
                         + subDungeon.left.debugId + ": " + subDungeon.left.rect + ", "
                         + subDungeon.right.debugId + ": " + subDungeon.right.rect);
 
@@ -318,6 +361,77 @@ public class BoardManager : MonoBehaviour
         }
     }
 
+    void chooseRooms()
+    {
+        //choose entry room
+        SubDungeon entry = root.chooseRoom(allRooms);
+        fillRoom(entry, 3);
+        SubDungeon entry2 = root.chooseRoom(allRooms);
+        fillRoom(entry2, 3);
+        SubDungeon exit = root.chooseRoom(allRooms);
+        fillRoom(exit, 1);
+        foreach (SubDungeon room in allRooms)
+        {
+            if(!room.roomChosen)
+            {
+                double chance = Random.Range(0.0f, 1.0f);
+                if(chance <= 0.2f)
+                {
+                    Debug.Log("Rolled " + chance);
+                    fillRoom(room, 3);
+                }
+                if(0.2f < chance && chance <= .5f)
+                {
+                    fillRoom(room, 4);
+                }
+            }
+        }
+        //choose exit room
+
+        //choose key room
+
+        //choose enemy rooms
+    }
+
+    //room types
+    //0: entry room
+    //1: exit room
+    //2: key room
+    //3: enemy room
+    //4: med room
+    public void fillRoom(SubDungeon room, int type)
+    {
+        if (type == 3)
+        {
+            Vector2 loc = room.randRoomPoint(room);
+            GameObject instance = Instantiate(enemy, loc, Quaternion.identity) as GameObject;
+            //TransporterScript tsScript = instance.GetComponent<TransporterScript>();
+            //tsScript.accessible ==
+            instance.transform.SetParent(transform);
+            //boardPositionsFloor[i, j] = instance;
+        }
+        else if (type == 1)
+        {
+            Vector2 loc = room.randRoomPoint(room);
+            GameObject instance = Instantiate(teleporter, loc, Quaternion.identity) as GameObject;
+            TransporterScript tsScript = instance.GetComponent<TransporterScript>();
+            tsScript.accessible = true;
+            tsScript.newScene = true;
+            instance.transform.SetParent(transform);
+            //boardPositionsFloor[i, j] = instance;
+        }
+        else if (type == 4)
+        {
+            Vector2 loc = room.randRoomPoint(room);
+            Vector2 loc2 = room.randRoomPoint(room);
+            GameObject instance = Instantiate(hpack, loc, Quaternion.identity) as GameObject;
+            GameObject instance2 = Instantiate(hpack, loc, Quaternion.identity) as GameObject;
+            //TransporterScript tsScript = instance.GetComponent<TransporterScript>();
+            //sScript.newScene = true;
+            instance.transform.SetParent(transform);
+        }
+    }
+
     void placePlayer()
     {
         for(int i = 0; i < Mathf.Min(boardColumns, boardRows); i++)
@@ -334,13 +448,16 @@ public class BoardManager : MonoBehaviour
 
     void Start()
     {
-        SubDungeon rootSubDungeon = new SubDungeon(new Rect(0, 0, boardRows, boardColumns));
-        CreateBSP(rootSubDungeon);
-        rootSubDungeon.CreateRoom();
+        allRooms = new List<SubDungeon>();
+        root = new SubDungeon(new Rect(0, 0, boardRows, boardColumns));
+        CreateBSP(root);
+        root.CreateRoom();
+        root.ListRooms(root, allRooms);
+        chooseRooms();
 
         boardPositionsFloor = new GameObject[boardRows, boardColumns];
-        DrawRooms(rootSubDungeon);
-        DrawCorridors(rootSubDungeon);
+        DrawRooms(root);
+        DrawCorridors(root);
 
         placePlayer();
         MakeWalls();
