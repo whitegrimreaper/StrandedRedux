@@ -86,7 +86,7 @@ public class GrammarGenerationScript : MonoBehaviour
         //dung.allFloorRooms = new List<List<GSubDungeon>>();
         GSubDungeon root = new GSubDungeon(new Rect(-1, -1, 0, 0));
         dung.root = root;
-        GenerateGrammar(gram, root);
+        GenerateGrammar(gram, root, 0);
         
     }
 
@@ -96,9 +96,18 @@ public class GrammarGenerationScript : MonoBehaviour
         
     }
 
-    private void GenerateGrammar(BaseGrammar baseG, GSubDungeon root)
+    private void GenerateGrammar(BaseGrammar baseG, GSubDungeon root, int lastDir)
     {
         Debug.Log("Splitting sub-dungeon");
+        int rand = Random.Range(1, 8);
+        //1: up
+        //2: down
+        switch(rand)
+        {
+            case 1:
+                //somethin
+                break;
+        }
     }
 
     public void GenerateRooms()
