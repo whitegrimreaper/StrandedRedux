@@ -26,13 +26,9 @@ public class TransporterScript : MonoBehaviour
     public void loadNewScene()
     {
         Debug.Log(SceneManager.GetActiveScene().name);
-        if(SceneManager.GetActiveScene().name == "BSPScene")
-        {
-            SceneManager.LoadScene("BSPScene");
-        }
-        else
-        {
-            SceneManager.LoadScene("BSPScene");
-        }
+        //if(SceneManager.GetActiveScene().name == "BSPScene")
+        //{
+            SceneManager.LoadScene(newSceneName);
+        //}
     }
 }
