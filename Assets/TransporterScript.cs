@@ -8,6 +8,7 @@ public class TransporterScript : MonoBehaviour
     public Vector2 destination;
     public bool accessible;
     public bool newScene;
+    public string newSceneName;
     //public 
 
     // Start is called before the first frame update

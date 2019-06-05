@@ -14,6 +14,11 @@ public class FurnitureScript : MonoBehaviour
 
     private TileScript.Openable openable;
 
+    public Sprite sprite1;
+    public Sprite sprite2;
+    public Sprite sprite3;
+    public Sprite sprite4;
+
     // Use this for initialization
     void Start()
     {

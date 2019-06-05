@@ -44,14 +44,14 @@ TagManager:
   - 
   - 
   m_SortingLayers:
-  - name: Default
-    uniqueID: 0
-    locked: 0
   - name: Tile
     uniqueID: 3840255991
     locked: 0
   - name: Furniture
     uniqueID: 1113717115
+    locked: 0
+  - name: Default
+    uniqueID: 0
     locked: 0
   - name: Item
     uniqueID: 2165614553
